@@ -1,19 +1,11 @@
 ---
-- name: Create config directory
-  ansible.builtin.file:
-    path: "{{app_smokeping_dir}}/config"
-    state: directory
-    owner: "{{app_smokeping_puid}}"
-    group: "{{app_smokeping_pgid}}"
-    mode: 0755
+- name: Create smokeping config volume
+  community.docker.docker_volume:
+    name: app_smokeping_config
 
-- name: Create data directory
-  ansible.builtin.file:
-    path: "{{app_smokeping_dir}}/data"
-    state: directory
-    owner: "{{app_smokeping_puid}}"
-    group: "{{app_smokeping_pgid}}"
-    mode: 0755
+- name: Create smokeping data volume
+  community.docker.docker_volume:
+    name: app_smokeping_data
 
 - name: Ensure linuxserver/smokeping image is pulled
   community.docker.docker_image:
@@ -34,18 +26,21 @@
   register: result
 
 - name: Create smokeping container
-  ansible.builtin.shell: |
-    docker run -d \
-    --name=smokeping \
-    -e PUID={{app_smokeping_puid}} \
-    -e PGID={{app_smokeping_pgid}} \
-    -e TZ={{app_smokeping_tz}} \
-    -v /{{app_smokeping_dir}}/config:/config:Z \
-    -v /{{app_smokeping_dir}}/data:/data:Z \
-    --network=app-network \
-    --restart unless-stopped \
-    lscr.io/linuxserver/smokeping
-  when: 
+  community.docker.docker_container:
+    env:
+     TZ: "{{app_smokeping_tz}}"
+    image: lscr.io/linuxserver/smokeping
+    mounts:
+     - source: app_smokeping_config
+       target: /config
+     - source: app_smokeping_data
+       target: /data
+    name: smokeping
+    networks:
+     - name: app-network
+    restart_policy: unless-stopped
+    state: started
+  when:
     pulled.changed
     or
     result.exists == false
