@@ -1,11 +1,11 @@
 ---
 - name: Create smokeping config volume
   community.docker.docker_volume:
-    name: app_smokeping_config
+    name: smokeping_config
 
 - name: Create smokeping data volume
   community.docker.docker_volume:
-    name: app_smokeping_data
+    name: smokeping_data
 
 - name: Ensure linuxserver/smokeping image is pulled
   community.docker.docker_image:
@@ -31,9 +31,9 @@
      TZ: "{{app_smokeping_tz}}"
     image: lscr.io/linuxserver/smokeping
     mounts:
-     - source: app_smokeping_config
+     - source: smokeping_config
        target: /config
-     - source: app_smokeping_data
+     - source: smokeping_data
        target: /data
     name: smokeping
     networks:
