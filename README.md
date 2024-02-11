@@ -5,6 +5,17 @@
 
 Docker Image: https://docs.linuxserver.io/images/docker-smokeping
 
+## Options
+
+| Option | Default Value |
+| ---- | ---- |
+| app_smokeping_docker_volume_config | smokeping_config |
+| app_smokeping_docker_volume_data | smokeping_data |
+| app_smokeping_docker_image | lscr.io/linuxserver/smokeping |
+| app_smokeping_docker_container | smokeping |
+| app_smokeping_docker_network | app-network |
+| app_smokeping_tz | Europe/Zurich |
+
 ## License
 
 This project is under the MIT License. See the [LICENSE](https://github.com/ursinn-ansible/role-smokeping/blob/main/LICENSE) file for the full license text.

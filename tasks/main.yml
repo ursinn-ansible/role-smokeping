@@ -1,43 +1,43 @@
 ---
 - name: Create smokeping config volume
   community.docker.docker_volume:
-    name: smokeping_config
+    name: "{{ app_smokeping_docker_volume_config }}"
 
 - name: Create smokeping data volume
   community.docker.docker_volume:
-    name: smokeping_data
+    name: "{{ app_smokeping_docker_volume_data }}"
 
-- name: Ensure linuxserver/smokeping image is pulled
+- name: Ensure smokeping image is pulled
   community.docker.docker_image:
-    name: lscr.io/linuxserver/smokeping
+    name: "{{ app_smokeping_docker_image }}"
     source: pull
     force_source: yes
   register: pulled
 
 - name: Remove smokeping container
   community.docker.docker_container:
-    name: smokeping
+    name: "{{ app_smokeping_docker_container }}"
     state: absent
   when: pulled.changed
 
 - name: Get infos on smokeping container
   community.docker.docker_container_info:
-    name: smokeping
+    name: "{{ app_smokeping_docker_container }}"
   register: result
 
 - name: Create smokeping container
   community.docker.docker_container:
     env:
      TZ: "{{app_smokeping_tz}}"
-    image: lscr.io/linuxserver/smokeping
+    image: "{{ app_smokeping_docker_image }}"
     mounts:
-     - source: smokeping_config
+     - source: "{{ app_smokeping_docker_volume_config }}"
        target: /config
-     - source: smokeping_data
+     - source: "{{ app_smokeping_docker_volume_data }}"
        target: /data
-    name: smokeping
+    name: "{{ app_smokeping_docker_container }}"
     networks:
-     - name: app-network
+     - name: "{{ app_smokeping_docker_network }}"
     restart_policy: unless-stopped
     state: started
   when:
