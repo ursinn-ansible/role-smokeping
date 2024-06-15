@@ -1,43 +1,57 @@
 ---
-- name: Create smokeping config volume
-  community.docker.docker_volume:
-    name: "{{ app_smokeping_docker_volume_config }}"
+- name: set vars
+  set_fact:
+    docker_image: '{{ app_smokeping_docker_image }}'
+    docker_container: '{{ app_smokeping_docker_container }}'
+    docker_volume_config: '{{ app_smokeping_docker_volume_config }}'
+    docker_volume_data: '{{ app_smokeping_docker_volume_data }}'
+    docker_network: '{{ app_smokeping_docker_network }}'
 
-- name: Create smokeping data volume
-  community.docker.docker_volume:
-    name: "{{ app_smokeping_docker_volume_data }}"
-
-- name: Ensure smokeping image is pulled
+- name: Ensure image is pulled
   community.docker.docker_image:
-    name: "{{ app_smokeping_docker_image }}"
+    name: "{{ docker_image }}"
     source: pull
     force_source: yes
   register: pulled
 
-- name: Remove smokeping container
+- name: Remove container
   community.docker.docker_container:
-    name: "{{ app_smokeping_docker_container }}"
+    name: "{{ docker_container }}"
     state: absent
   when: pulled.changed
 
-- name: Get infos on smokeping container
+- name: Get infos on container
   community.docker.docker_container_info:
-    name: "{{ app_smokeping_docker_container }}"
+    name: "{{ docker_container }}"
   register: result
+
+- name: Create config volume
+  community.docker.docker_volume:
+    name: "{{ docker_volume_config }}"
+
+- name: Create data volume
+  community.docker.docker_volume:
+    name: "{{ docker_volume_data }}"
+
+- name: Create network
+  community.docker.docker_network:
+    name: "{{ docker_network }}"
+    driver_options:
+          com.docker.network.bridge.name: "br-{{ docker_network }}"
 
 - name: Create smokeping container
   community.docker.docker_container:
     env:
      TZ: "{{app_smokeping_tz}}"
-    image: "{{ app_smokeping_docker_image }}"
+    image: "{{ docker_image }}"
     mounts:
-     - source: "{{ app_smokeping_docker_volume_config }}"
+     - source: "{{ docker_volume_config }}"
        target: /config
-     - source: "{{ app_smokeping_docker_volume_data }}"
+     - source: "{{ docker_volume_data }}"
        target: /data
-    name: "{{ app_smokeping_docker_container }}"
+    name: "{{ docker_container }}"
     networks:
-     - name: "{{ app_smokeping_docker_network }}"
+     - name: "{{ docker_network }}"
     restart_policy: unless-stopped
     state: started
   when:
