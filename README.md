@@ -9,12 +9,13 @@ Docker Image: https://docs.linuxserver.io/images/docker-smokeping
 
 | Option | Default Value |
 | ---- | ---- |
-| app_smokeping_docker_volume_config | smokeping_config |
-| app_smokeping_docker_volume_data | smokeping_data |
-| app_smokeping_docker_image | lscr.io/linuxserver/smokeping |
-| app_smokeping_docker_container | smokeping |
-| app_smokeping_docker_network | app-network |
-| app_smokeping_tz | Europe/Zurich |
+| role_smokeping_image | lscr.io/linuxserver/smokeping |
+| role_smokeping_container | smokeping |
+| role_smokeping_puid | 1000 |
+| role_smokeping_pgid | 1000 |
+| role_smokeping_tz | Europe/Zurich |
+| role_smokeping_dir | /opt/app-smokeping |
+| role_smokeping_network | app-network |
 
 ## License
 
