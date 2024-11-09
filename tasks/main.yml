@@ -1,11 +1,30 @@
 ---
 - name: set vars
   set_fact:
-    docker_image: '{{ app_smokeping_docker_image }}'
-    docker_container: '{{ app_smokeping_docker_container }}'
-    docker_volume_config: '{{ app_smokeping_docker_volume_config }}'
-    docker_volume_data: '{{ app_smokeping_docker_volume_data }}'
-    docker_network: '{{ app_smokeping_docker_network }}'
+    docker_image: '{{ role_smokeping_image }}'
+    docker_container: '{{ role_smokeping_container }}'
+    docker_puid: '{{ role_smokeping_puid }}'
+    docker_pgid: '{{ role_smokeping_pgid }}'
+    docker_tz: '{{ role_smokeping_tz }}'
+    docker_dir_config: '{{ role_smokeping_dir }}/config'
+    docker_dir_data: '{{ role_smokeping_dir }}/data'
+    docker_network: '{{ role_smokeping_network }}'
+
+- name: Create config directory
+  ansible.builtin.file:
+    path: '{{docker_dir_config}}'
+    state: directory
+    owner: '{{ docker_puid }}'
+    group: '{{ docker_pgid }}'
+    mode: 0755
+
+- name: Create data directory
+  ansible.builtin.file:
+    path: '{{docker_dir_data}}'
+    state: directory
+    owner: '{{ docker_puid }}'
+    group: '{{ docker_pgid }}'
+    mode: 0755
 
 - name: Ensure image is pulled
   community.docker.docker_image:
@@ -25,14 +44,6 @@
     name: "{{ docker_container }}"
   register: result
 
-- name: Create config volume
-  community.docker.docker_volume:
-    name: "{{ docker_volume_config }}"
-
-- name: Create data volume
-  community.docker.docker_volume:
-    name: "{{ docker_volume_data }}"
-
 - name: Create network
   community.docker.docker_network:
     name: "{{ docker_network }}"
@@ -41,14 +52,14 @@
 
 - name: Create smokeping container
   community.docker.docker_container:
-    env:
-     TZ: "{{app_smokeping_tz}}"
     image: "{{ docker_image }}"
-    mounts:
-     - source: "{{ docker_volume_config }}"
-       target: /config
-     - source: "{{ docker_volume_data }}"
-       target: /data
+    volumes:
+     - '{{ docker_dir_config }}:/config:Z'
+     - '{{ docker_dir_data }}:/data:Z'
+    env:
+      PUID: '{{ docker_puid }}'
+      PGID: '{{ docker_pgid }}'
+      TZ: '{{ docker_tz }}'
     name: "{{ docker_container }}"
     networks:
      - name: "{{ docker_network }}"
