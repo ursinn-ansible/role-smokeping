@@ -1,4 +1,4 @@
-# Template 1, Version 23/11/2024
+# Template 2, Version 23/11/2024
 ---
 - name: set vars
   set_fact:
@@ -29,31 +29,31 @@
 
 - name: Ensure image is pulled
   community.docker.docker_image:
-    name: "{{ docker_image }}"
+    name: '{{ docker_image }}'
     source: pull
     force_source: yes
   register: pulled
 
 - name: Remove container
   community.docker.docker_container:
-    name: "{{ docker_container }}"
+    name: '{{ docker_container }}'
     state: absent
   when: pulled.changed
 
 - name: Get infos on container
   community.docker.docker_container_info:
-    name: "{{ docker_container }}"
+    name: '{{ docker_container }}'
   register: result
 
 - name: Create network
   community.docker.docker_network:
-    name: "{{ docker_network }}"
+    name: '{{ docker_network }}'
     driver_options:
-          com.docker.network.bridge.name: "br-{{ docker_network }}"
+      com.docker.network.bridge.name: 'br-{{ docker_network }}'
 
 - name: Create smokeping container
   community.docker.docker_container:
-    image: "{{ docker_image }}"
+    image: '{{ docker_image }}'
     volumes:
      - '{{ docker_dir_config }}:/config:Z'
      - '{{ docker_dir_data }}:/data:Z'
@@ -61,9 +61,9 @@
       PUID: '{{ docker_puid }}'
       PGID: '{{ docker_pgid }}'
       TZ: '{{ docker_tz }}'
-    name: "{{ docker_container }}"
+    name: '{{ docker_container }}'
     networks:
-     - name: "{{ docker_network }}"
+     - name: '{{ docker_network }}'
     restart_policy: unless-stopped
     state: started
   when:
