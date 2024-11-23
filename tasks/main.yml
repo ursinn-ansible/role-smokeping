@@ -1,3 +1,4 @@
+# Template 1, Version 23/11/2024
 ---
 - name: set vars
   set_fact:
@@ -12,7 +13,7 @@
 
 - name: Create config directory
   ansible.builtin.file:
-    path: '{{docker_dir_config}}'
+    path: '{{ docker_dir_config }}'
     state: directory
     owner: '{{ docker_puid }}'
     group: '{{ docker_pgid }}'
@@ -20,7 +21,7 @@
 
 - name: Create data directory
   ansible.builtin.file:
-    path: '{{docker_dir_data}}'
+    path: '{{ docker_dir_data }}'
     state: directory
     owner: '{{ docker_puid }}'
     group: '{{ docker_pgid }}'
